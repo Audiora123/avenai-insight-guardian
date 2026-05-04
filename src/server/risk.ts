@@ -1,4 +1,4 @@
-import type { TokenStats, HolderRow, WalletApproval, WalletHolding } from "./types";
+import type { TokenStats, HolderRow, WalletApproval, WalletHolding } from "./data/types";
 
 export interface RiskFactor {
   key: string;
