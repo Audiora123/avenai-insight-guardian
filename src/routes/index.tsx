@@ -51,7 +51,7 @@ function Index() {
       {/* Trending */}
       <SectionHeader title="Trending on Solana" subtitle={`${tokens.length} tokens · ranked by 24h volume`} />
       <div className="mt-3 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-        {tokens.slice(0, 12).map((t) => (
+        {tokens.slice(0, 12).map((t: typeof tokens[number]) => (
           <Link
             key={t.mint}
             to="/token/$mint"
