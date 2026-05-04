@@ -78,7 +78,7 @@ function WalletPage() {
                   )}
                 >
                   {t.charAt(0).toUpperCase() + t.slice(1)}
-                  {t === "approvals" && approvals.some((a) => a.riskLevel === "danger") && (
+                  {t === "approvals" && approvals.some((a: { riskLevel: string }) => a.riskLevel === "danger") && (
                     <ShieldAlert className="ml-1.5 inline-block size-3.5 text-danger" />
                   )}
                 </button>

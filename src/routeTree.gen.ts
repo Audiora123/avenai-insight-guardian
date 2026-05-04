@@ -9,38 +9,75 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WalletAddressRouteImport } from './routes/wallet.$address'
+import { Route as TokenMintRouteImport } from './routes/token.$mint'
 
+const AgentsRoute = AgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WalletAddressRoute = WalletAddressRouteImport.update({
+  id: '/wallet/$address',
+  path: '/wallet/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TokenMintRoute = TokenMintRouteImport.update({
+  id: '/token/$mint',
+  path: '/token/$mint',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/agents': typeof AgentsRoute
+  '/token/$mint': typeof TokenMintRoute
+  '/wallet/$address': typeof WalletAddressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/agents': typeof AgentsRoute
+  '/token/$mint': typeof TokenMintRoute
+  '/wallet/$address': typeof WalletAddressRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/agents': typeof AgentsRoute
+  '/token/$mint': typeof TokenMintRoute
+  '/wallet/$address': typeof WalletAddressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/agents' | '/token/$mint' | '/wallet/$address'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/agents' | '/token/$mint' | '/wallet/$address'
+  id: '__root__' | '/' | '/agents' | '/token/$mint' | '/wallet/$address'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AgentsRoute: typeof AgentsRoute
+  TokenMintRoute: typeof TokenMintRoute
+  WalletAddressRoute: typeof WalletAddressRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/agents': {
+      id: '/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AgentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wallet/$address': {
+      id: '/wallet/$address'
+      path: '/wallet/$address'
+      fullPath: '/wallet/$address'
+      preLoaderRoute: typeof WalletAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/token/$mint': {
+      id: '/token/$mint'
+      path: '/token/$mint'
+      fullPath: '/token/$mint'
+      preLoaderRoute: typeof TokenMintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AgentsRoute: AgentsRoute,
+  TokenMintRoute: TokenMintRoute,
+  WalletAddressRoute: WalletAddressRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
