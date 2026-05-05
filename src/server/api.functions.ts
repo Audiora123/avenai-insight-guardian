@@ -8,14 +8,16 @@ import {
   getWalletHoldings,
   getWalletApprovals,
   getWalletRecentTx,
+  getNewSolanaTokens,
 } from "./data/index.server";
 import { scoreToken, scoreWallet } from "./risk";
 import { predictByAnalogs, predictByRules } from "./predict";
 
 export const fetchTrending = createServerFn({ method: "GET" }).handler(async () => {
-  const tokens = await getTrending(24);
-  return { tokens };
+  const [tokens, fresh] = await Promise.all([getTrending(40), getNewSolanaTokens(12)]);
+  return { tokens, fresh };
 });
+
 
 export const fetchSearch = createServerFn({ method: "GET" })
   .inputValidator((d: { q: string }) => d)
