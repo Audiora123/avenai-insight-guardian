@@ -168,10 +168,8 @@ export function Header() {
           <Link to="/" className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-surface hover:text-foreground" activeProps={{ className: "text-foreground bg-surface" }} activeOptions={{ exact: true }}>
             Discover
           </Link>
-          <Link to="/agents" className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-surface hover:text-foreground" activeProps={{ className: "text-foreground bg-surface" }}>
-            Agents API
-          </Link>
         </nav>
+
 
         <div className="flex flex-1 items-center justify-center px-2">
           <GlobalSearch />

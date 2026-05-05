@@ -1,140 +1,143 @@
 import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowUpRight, Shield, Activity, Zap } from "lucide-react";
+import { Sparkles, TrendingUp, Wallet, ShieldCheck } from "lucide-react";
 
 import { fetchTrending } from "@/server/api.functions";
 import { compact, formatPct, formatUsd, shortAddr } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import type { TrendingToken } from "@/server/data/types";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Avenai — Discover Solana tokens" },
-      { name: "description", content: "Trending Solana tokens with live risk scores, holder intelligence, and pre-swap warnings." },
+      { title: "Avenai — Solana token & wallet intelligence" },
+      { name: "description", content: "Discover trending Solana tokens, get pre-swap risk verdicts, and X-ray any wallet. Powered by GoldRush." },
     ],
   }),
   loader: () => fetchTrending(),
   component: Index,
 });
 
+type Tab = "trending" | "gainers" | "losers" | "new";
+
 function Index() {
-  const { tokens } = Route.useLoaderData();
-  const gainers = [...tokens].sort((a, b) => (b.priceChange24h ?? -999) - (a.priceChange24h ?? -999)).slice(0, 6);
-  const losers = [...tokens].sort((a, b) => (a.priceChange24h ?? 999) - (b.priceChange24h ?? 999)).slice(0, 6);
+  const { tokens, fresh } = Route.useLoaderData();
+  const [tab, setTab] = React.useState<Tab>("trending");
+
+  const rows = React.useMemo(() => {
+    if (tab === "gainers") return [...tokens].sort((a, b) => (b.priceChange24h ?? -999) - (a.priceChange24h ?? -999)).slice(0, 30);
+    if (tab === "losers") return [...tokens].sort((a, b) => (a.priceChange24h ?? 999) - (b.priceChange24h ?? 999)).slice(0, 30);
+    if (tab === "new") return fresh;
+    return tokens.slice(0, 30);
+  }, [tab, tokens, fresh]);
 
   return (
-    <main className="mx-auto max-w-[1400px] px-4 py-8">
-      {/* Hero */}
-      <section className="mb-10 grid gap-6 md:grid-cols-3">
-        <div className="md:col-span-2">
-          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+    <main className="mx-auto max-w-[1400px] px-4 py-6">
+      {/* Hero strip */}
+      <section className="mb-6 grid gap-3 md:grid-cols-4">
+        <div className="md:col-span-2 rounded-lg border border-hairline bg-surface p-5">
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Solana intelligence</div>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-[28px]">
             See risk before you swap.
           </h1>
-          <p className="mt-3 max-w-xl text-sm text-muted-foreground md:text-base">
-            Avenai turns Solana on-chain data into instant verdicts — token risk, wallet hygiene,
-            holder intelligence, and live whale signals — so you stop trading blind.
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            Trending tokens, fresh launches, holder concentration and wallet hygiene — all from real on-chain data.
           </p>
-          <div className="mt-5 flex flex-wrap items-center gap-3">
-            <Link to="/agents" className="inline-flex items-center gap-1 rounded-md border border-hairline px-3 py-2 text-sm hover:border-foreground/40">
-              Agents API <ArrowUpRight className="size-3.5" />
-            </Link>
-            <span className="text-xs text-muted-foreground">x402 paid endpoint · Solana devnet USDC settlement</span>
+        </div>
+        <Tile icon={ShieldCheck} title="Pre-swap check" desc="Open any token to get a verdict." />
+        <Tile icon={Wallet} title="Wallet X-ray" desc="Paste a Solana address." />
+      </section>
+
+      {/* Token table */}
+      <section className="rounded-lg border border-hairline bg-surface">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-hairline px-4 py-3">
+          <div className="flex items-center gap-1">
+            <TabBtn active={tab === "trending"} onClick={() => setTab("trending")} icon={TrendingUp} label="Trending" />
+            <TabBtn active={tab === "gainers"} onClick={() => setTab("gainers")} label="Top gainers" />
+            <TabBtn active={tab === "losers"} onClick={() => setTab("losers")} label="Top losers" />
+            <TabBtn active={tab === "new"} onClick={() => setTab("new")} icon={Sparkles} label="New on Solana" />
+          </div>
+          <div className="text-[11px] text-muted-foreground">
+            {rows.length} tokens · live from Solana DEXs
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-2 md:grid-cols-1">
-          <Stat icon={Shield} label="Risk factors scored" value="11" />
-          <Stat icon={Activity} label="Live signals tracked" value="24/7" />
-          <Stat icon={Zap} label="Median verdict latency" value="<2s" />
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-surface-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-4 py-2.5 text-left">#</th>
+                <th className="px-4 py-2.5 text-left">Token</th>
+                <th className="px-4 py-2.5 text-right">Price</th>
+                <th className="px-4 py-2.5 text-right">24h</th>
+                <th className="hidden px-4 py-2.5 text-right md:table-cell">Volume 24h</th>
+                <th className="hidden px-4 py-2.5 text-right md:table-cell">Liquidity</th>
+                <th className="hidden px-4 py-2.5 text-right lg:table-cell">Mkt cap</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-hairline">
+              {rows.map((t: TrendingToken, i: number) => (
+                <tr key={t.mint} className="hover:bg-surface-2">
+                  <td className="px-4 py-2.5 text-muted-foreground tabular">{i + 1}</td>
+                  <td className="px-4 py-2.5">
+                    <Link to="/token/$mint" params={{ mint: t.mint }} className="flex items-center gap-2.5">
+                      <div className="size-7 shrink-0 overflow-hidden rounded-full bg-surface-2">
+                        {t.logo ? <img src={t.logo} alt="" className="size-full object-cover" loading="lazy" /> : null}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{t.symbol}</span>
+                          <span className="truncate text-xs text-muted-foreground">{t.name}</span>
+                        </div>
+                        <div className="font-mono text-[10px] text-muted-foreground">{shortAddr(t.mint, 4, 4)}</div>
+                      </div>
+                    </Link>
+                  </td>
+                  <td className="nums px-4 py-2.5 text-right">{formatUsd(t.priceUsd)}</td>
+                  <td className={cn("nums px-4 py-2.5 text-right", (t.priceChange24h ?? 0) >= 0 ? "text-safe" : "text-danger")}>
+                    {formatPct(t.priceChange24h)}
+                  </td>
+                  <td className="nums hidden px-4 py-2.5 text-right md:table-cell">${compact(t.volume24hUsd ?? 0)}</td>
+                  <td className="nums hidden px-4 py-2.5 text-right md:table-cell">${compact(t.liquidityUsd ?? 0)}</td>
+                  <td className="nums hidden px-4 py-2.5 text-right lg:table-cell">${compact(t.marketCapUsd ?? 0)}</td>
+                </tr>
+              ))}
+              {rows.length === 0 && (
+                <tr><td colSpan={7} className="px-4 py-12 text-center text-sm text-muted-foreground">Loading Solana market data…</td></tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </section>
 
-      {/* Trending */}
-      <SectionHeader title="Trending on Solana" subtitle={`${tokens.length} tokens · ranked by 24h volume`} />
-      <div className="mt-3 grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-        {tokens.slice(0, 12).map((t: typeof tokens[number]) => (
-          <Link
-            key={t.mint}
-            to="/token/$mint"
-            params={{ mint: t.mint }}
-            className="group flex items-center gap-3 rounded-lg border border-hairline bg-surface px-3 py-3 transition hover:border-foreground/40"
-          >
-            <div className="size-10 shrink-0 overflow-hidden rounded-full bg-surface-2">
-              {t.logo ? <img src={t.logo} alt="" className="size-full object-cover" /> : null}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{t.symbol}</span>
-                <span className="truncate text-xs text-muted-foreground">{t.name}</span>
-              </div>
-              <div className="text-[11px] text-muted-foreground">{shortAddr(t.mint)}</div>
-            </div>
-            <div className="text-right">
-              <div className="nums text-sm">{formatUsd(t.priceUsd)}</div>
-              <div className={cn("nums text-xs", (t.priceChange24h ?? 0) >= 0 ? "text-safe" : "text-danger")}>
-                {formatPct(t.priceChange24h)}
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {/* Gainers / Losers */}
-      <div className="mt-10 grid gap-6 lg:grid-cols-2">
-        <Movers title="Top gainers · 24h" tokens={gainers} positive />
-        <Movers title="Top losers · 24h" tokens={losers} positive={false} />
-      </div>
+      <p className="mt-6 text-center text-[11px] text-muted-foreground">
+        Powered by GoldRush · DexScreener · Jupiter · Solana RPC
+      </p>
     </main>
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: typeof Shield; label: string; value: string }) {
+function Tile({ icon: Icon, title, desc }: { icon: typeof Wallet; title: string; desc: string }) {
   return (
-    <div className="rounded-lg border border-hairline bg-surface px-3 py-3">
-      <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-        <Icon className="size-3.5" /> {label}
-      </div>
-      <div className="mt-1 text-xl font-semibold tabular">{value}</div>
+    <div className="rounded-lg border border-hairline bg-surface p-4">
+      <Icon className="size-5 text-muted-foreground" />
+      <div className="mt-2 text-sm font-semibold">{title}</div>
+      <div className="text-xs text-muted-foreground">{desc}</div>
     </div>
   );
 }
 
-function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+function TabBtn({ active, onClick, icon: Icon, label }: { active: boolean; onClick: () => void; icon?: typeof Wallet; label: string }) {
   return (
-    <div className="flex items-end justify-between">
-      <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-      {subtitle && <span className="text-xs text-muted-foreground">{subtitle}</span>}
-    </div>
-  );
-}
-
-function Movers({ title, tokens, positive }: { title: string; tokens: ReturnType<typeof Array.prototype.slice>; positive: boolean }) {
-  return (
-    <div className="rounded-lg border border-hairline bg-surface">
-      <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
-        <h3 className="text-sm font-semibold">{title}</h3>
-        <span className={cn("text-[11px]", positive ? "text-safe" : "text-danger")}>
-          {positive ? "Outperformers" : "Underperformers"}
-        </span>
-      </div>
-      <ul className="divide-y divide-hairline">
-        {tokens.map((t: { mint: string; symbol: string; name: string; logo: string | null; priceUsd: number | null; priceChange24h: number | null; volume24hUsd: number | null }) => (
-          <li key={t.mint}>
-            <Link to="/token/$mint" params={{ mint: t.mint }} className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-2">
-              <div className="size-7 shrink-0 overflow-hidden rounded-full bg-surface-2">
-                {t.logo ? <img src={t.logo} alt="" className="size-full object-cover" /> : null}
-              </div>
-              <span className="flex-1 text-sm">{t.symbol}</span>
-              <span className="nums text-sm">{formatUsd(t.priceUsd)}</span>
-              <span className={cn("nums w-16 text-right text-sm", (t.priceChange24h ?? 0) >= 0 ? "text-safe" : "text-danger")}>
-                {formatPct(t.priceChange24h)}
-              </span>
-              <span className="nums hidden w-20 text-right text-xs text-muted-foreground sm:inline">
-                {compact(t.volume24hUsd ?? 0)}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <button
+      onClick={onClick}
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition",
+        active ? "bg-foreground text-background" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+      )}
+    >
+      {Icon && <Icon className="size-3.5" />}
+      {label}
+    </button>
   );
 }

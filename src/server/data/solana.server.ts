@@ -343,3 +343,45 @@ export async function getWalletRecentTx(owner: string, limit = 20): Promise<Wall
 }
 
 export { loadTokenList };
+
+// ---------- New tokens on Solana (recently created, ranked by liquidity)
+export async function getNewSolanaTokens(limit = 12): Promise<TrendingToken[]> {
+  const queries = ["pump", "new", "fresh", "launch"];
+  const seen = new Map<string, TrendingToken & { ageH: number }>();
+  for (const q of queries) {
+    const data = await dsFetch<{ pairs: DsPair[] }>(
+      `https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(q)}`,
+    );
+    if (!data?.pairs) continue;
+    for (const p of data.pairs) {
+      if (p.chainId !== "solana") continue;
+      const created = p.pairCreatedAt ?? 0;
+      if (!created) continue;
+      const ageH = (Date.now() - created) / 3_600_000;
+      if (ageH > 72) continue; // fresh = under 3 days
+      const mint = p.baseToken.address;
+      if (mint === SOL_MINT) continue;
+      const cur = seen.get(mint);
+      if (!cur || (p.liquidity?.usd ?? 0) > (cur.liquidityUsd ?? 0)) {
+        seen.set(mint, {
+          mint,
+          symbol: p.baseToken.symbol,
+          name: p.baseToken.name,
+          logo: p.info?.imageUrl ?? null,
+          priceUsd: p.priceUsd ? Number(p.priceUsd) : null,
+          priceChange24h: p.priceChange?.h24 ?? null,
+          volume24hUsd: p.volume?.h24 ?? null,
+          liquidityUsd: p.liquidity?.usd ?? null,
+          marketCapUsd: p.marketCap ?? null,
+          ageH,
+        });
+      }
+    }
+  }
+  return [...seen.values()]
+    .filter((t) => (t.liquidityUsd ?? 0) > 3_000)
+    .sort((a, b) => a.ageH - b.ageH)
+    .slice(0, limit)
+    .map(({ ageH: _ageH, ...rest }) => rest);
+}
+
