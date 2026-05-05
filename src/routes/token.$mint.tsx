@@ -1,13 +1,14 @@
 import * as React from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ShieldCheck, ShieldAlert, ShieldQuestion } from "lucide-react";
 
 import { fetchTokenPage } from "@/server/api.functions";
 import { compact, formatPct, formatUsd, shortAddr, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { RiskPanel } from "@/components/risk/RiskPanel";
 import { PredictionCards } from "@/components/predict/PredictionCards";
 import { PreSwapModal } from "@/components/risk/PreSwapModal";
+import type { RiskReport } from "@/server/risk";
+
 
 export const Route = createFileRoute("/token/$mint")({
   loader: ({ params }) => fetchTokenPage({ data: { mint: params.mint } }),
