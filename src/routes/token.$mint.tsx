@@ -45,7 +45,7 @@ export const Route = createFileRoute("/token/$mint")({
 function TokenPage() {
   const { mint } = Route.useParams();
   const { stats, holders, swaps, risk, analogs, rules } = Route.useLoaderData();
-  const [tab, setTab] = React.useState<"overview" | "holders" | "trades" | "risk">("overview");
+  const [tab, setTab] = React.useState<"overview" | "holders" | "trades">("overview");
   const [preSwapOpen, setPreSwapOpen] = React.useState(false);
 
   if (!stats) {
@@ -61,6 +61,14 @@ function TokenPage() {
   }
 
   const ch = stats.priceChange24h ?? 0;
+  const VIcon = risk.verdict === "safe" ? ShieldCheck : risk.verdict === "danger" ? ShieldAlert : ShieldQuestion;
+  const vTone =
+    risk.verdict === "safe" ? "border-safe/40 bg-safe/10 text-safe" :
+    risk.verdict === "danger" ? "border-danger/40 bg-danger/10 text-danger" :
+    "border-caution/40 bg-caution/10 text-caution";
+  const vLabel =
+    risk.verdict === "safe" ? "Safe to swap" :
+    risk.verdict === "danger" ? "Don't swap" : "Swap with caution";
 
   return (
     <main className="mx-auto max-w-[1400px] px-4 py-6">
@@ -104,47 +112,38 @@ function TokenPage() {
         </button>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
-        {/* Main column */}
-        <div>
-          <div className="border-b border-hairline">
-            <nav className="flex gap-1">
-              {(["overview", "holders", "trades", "risk"] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTab(t)}
-                  className={cn(
-                    "border-b-2 px-3 py-2 text-sm transition",
-                    tab === t ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
-                </button>
-              ))}
-            </nav>
-          </div>
+      {/* Verdict ribbon */}
+      <div className={cn("mt-4 flex items-center gap-3 rounded-lg border px-4 py-3", vTone)}>
+        <VIcon className="size-5" />
+        <div className="flex-1">
+          <div className="text-sm font-semibold">{vLabel}</div>
+          <div className="text-xs opacity-90">{risk.headline}</div>
+        </div>
+      </div>
 
-          <div className="mt-4">
-            {tab === "overview" && <PredictionCards analogs={analogs} rules={rules} />}
-            {tab === "holders" && <HoldersTable rows={holders} />}
-            {tab === "trades" && <TradesTable rows={swaps} />}
-            {tab === "risk" && <RiskPanel title="Token risk report" report={risk} />}
-          </div>
+      <div className="mt-6">
+        <div className="border-b border-hairline">
+          <nav className="flex gap-1">
+            {(["overview", "holders", "trades"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={cn(
+                  "border-b-2 px-3 py-2 text-sm transition",
+                  tab === t ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </nav>
         </div>
 
-        {/* Side rail */}
-        <aside className="space-y-4">
-          <RiskPanel title="Token risk" report={risk} />
-          <div className="rounded-lg border border-hairline bg-surface p-4 text-xs text-muted-foreground">
-            <div className="text-[11px] uppercase tracking-wider">Sources</div>
-            <ul className="mt-2 space-y-1">
-              <li>· DexScreener — pair metadata, liquidity, OHLCV</li>
-              <li>· Solana RPC — supply, holder distribution</li>
-              <li>· Jupiter — pricing</li>
-              <li className="text-foreground/70">· Migrating to GoldRush APIs on key activation</li>
-            </ul>
-          </div>
-        </aside>
+        <div className="mt-4">
+          {tab === "overview" && <PredictionCards analogs={analogs} rules={rules} />}
+          {tab === "holders" && <HoldersTable rows={holders} />}
+          {tab === "trades" && <TradesTable rows={swaps} />}
+        </div>
       </div>
 
       <PreSwapModal
