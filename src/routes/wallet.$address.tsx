@@ -6,6 +6,7 @@ import { compact, formatUsd, shortAddr, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { RiskPanel } from "@/components/risk/RiskPanel";
 import { ShieldAlert } from "lucide-react";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 export const Route = createFileRoute("/wallet/$address")({
   loader: ({ params }) => fetchWalletPage({ data: { address: params.address } }),
@@ -43,6 +44,7 @@ function WalletPage() {
   const { address } = Route.useParams();
   const { holdings, approvals, recent, totalUsd, risk } = Route.useLoaderData();
   const [tab, setTab] = React.useState<"holdings" | "approvals" | "activity">("holdings");
+  useAutoRefresh(30_000);
 
   return (
     <main className="mx-auto max-w-[1400px] px-4 py-6">
