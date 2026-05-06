@@ -4,6 +4,8 @@ import { ShieldCheck, ShieldAlert, ShieldQuestion, ArrowRight, ExternalLink, Act
 import { fetchTokenPage, fetchSaferAlternatives } from "@/server/api.functions";
 import { compact, formatPct, formatUsd, shortAddr } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import type { RiskFactor } from "@/server/risk";
+import type { TrendingToken } from "@/server/data/types";
 
 export const Route = createFileRoute("/preswap/$mint")({
   loader: async ({ params }) => {

@@ -13,6 +13,7 @@ import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WalletAddressRouteImport } from './routes/wallet.$address'
 import { Route as TokenMintRouteImport } from './routes/token.$mint'
+import { Route as PreswapMintRouteImport } from './routes/preswap.$mint'
 
 const AgentsRoute = AgentsRouteImport.update({
   id: '/agents',
@@ -34,16 +35,23 @@ const TokenMintRoute = TokenMintRouteImport.update({
   path: '/token/$mint',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PreswapMintRoute = PreswapMintRouteImport.update({
+  id: '/preswap/$mint',
+  path: '/preswap/$mint',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agents': typeof AgentsRoute
+  '/preswap/$mint': typeof PreswapMintRoute
   '/token/$mint': typeof TokenMintRoute
   '/wallet/$address': typeof WalletAddressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agents': typeof AgentsRoute
+  '/preswap/$mint': typeof PreswapMintRoute
   '/token/$mint': typeof TokenMintRoute
   '/wallet/$address': typeof WalletAddressRoute
 }
@@ -51,20 +59,33 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/agents': typeof AgentsRoute
+  '/preswap/$mint': typeof PreswapMintRoute
   '/token/$mint': typeof TokenMintRoute
   '/wallet/$address': typeof WalletAddressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/agents' | '/token/$mint' | '/wallet/$address'
+  fullPaths:
+    | '/'
+    | '/agents'
+    | '/preswap/$mint'
+    | '/token/$mint'
+    | '/wallet/$address'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/agents' | '/token/$mint' | '/wallet/$address'
-  id: '__root__' | '/' | '/agents' | '/token/$mint' | '/wallet/$address'
+  to: '/' | '/agents' | '/preswap/$mint' | '/token/$mint' | '/wallet/$address'
+  id:
+    | '__root__'
+    | '/'
+    | '/agents'
+    | '/preswap/$mint'
+    | '/token/$mint'
+    | '/wallet/$address'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AgentsRoute: typeof AgentsRoute
+  PreswapMintRoute: typeof PreswapMintRoute
   TokenMintRoute: typeof TokenMintRoute
   WalletAddressRoute: typeof WalletAddressRoute
 }
@@ -99,12 +120,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TokenMintRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/preswap/$mint': {
+      id: '/preswap/$mint'
+      path: '/preswap/$mint'
+      fullPath: '/preswap/$mint'
+      preLoaderRoute: typeof PreswapMintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgentsRoute: AgentsRoute,
+  PreswapMintRoute: PreswapMintRoute,
   TokenMintRoute: TokenMintRoute,
   WalletAddressRoute: WalletAddressRoute,
 }
