@@ -6,6 +6,7 @@ import { fetchTrending } from "@/server/api.functions";
 import { compact, formatPct, formatUsd, shortAddr } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { TrendingToken } from "@/server/data/types";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -21,8 +22,9 @@ export const Route = createFileRoute("/")({
 type Tab = "trending" | "gainers" | "losers" | "new";
 
 function Index() {
-  const { tokens, fresh } = Route.useLoaderData();
+  const { tokens, fresh, solPrice, goldrush } = Route.useLoaderData();
   const [tab, setTab] = React.useState<Tab>("trending");
+  useAutoRefresh(20_000);
 
   const rows = React.useMemo(() => {
     if (tab === "gainers") return [...tokens].sort((a, b) => (b.priceChange24h ?? -999) - (a.priceChange24h ?? -999)).slice(0, 30);
@@ -36,13 +38,27 @@ function Index() {
       {/* Hero strip */}
       <section className="mb-6 grid gap-3 md:grid-cols-4">
         <div className="md:col-span-2 rounded-lg border border-hairline bg-surface p-5">
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Solana intelligence</div>
+          <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+            <span>Solana intelligence</span>
+            {goldrush && (
+              <span className="inline-flex items-center gap-1 rounded border border-hairline px-1.5 py-0.5 text-[10px] normal-case text-foreground">
+                <span className="size-1.5 rounded-full bg-safe animate-pulse" /> GoldRush live
+              </span>
+            )}
+          </div>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-[28px]">
             See risk before you swap.
           </h1>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">
             Trending tokens, fresh launches, holder concentration and wallet hygiene — all from real on-chain data.
           </p>
+          {solPrice != null && (
+            <div className="mt-3 inline-flex items-center gap-2 rounded-md border border-hairline bg-surface-2 px-3 py-1.5 text-xs">
+              <span className="text-muted-foreground">SOL</span>
+              <span className="nums font-semibold">${solPrice.toFixed(2)}</span>
+              <span className="text-[10px] text-muted-foreground">via GoldRush spot pricing</span>
+            </div>
+          )}
         </div>
         <Tile icon={ShieldCheck} title="Pre-swap check" desc="Open any token to get a verdict." />
         <Tile icon={Wallet} title="Wallet X-ray" desc="Paste a Solana address." />
@@ -58,7 +74,7 @@ function Index() {
             <TabBtn active={tab === "new"} onClick={() => setTab("new")} icon={Sparkles} label="New on Solana" />
           </div>
           <div className="text-[11px] text-muted-foreground">
-            {rows.length} tokens · live from Solana DEXs
+            {rows.length} tokens · refreshes every 20s
           </div>
         </div>
 
