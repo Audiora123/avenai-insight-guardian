@@ -65,7 +65,7 @@ function TokenPage() {
     risk.verdict === "safe" ? "Safe to swap" :
     risk.verdict === "danger" ? "Don't swap" : "Swap with caution";
 
-  const sparkPoints = candles.map((c) => c.c);
+  const sparkPoints = candles.map((c: { c: number }) => c.c);
 
   return (
     <main className="mx-auto max-w-[1400px] px-4 py-6">
