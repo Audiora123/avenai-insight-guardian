@@ -93,7 +93,7 @@ function PreSwapPage() {
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Live · Solana RPC + GeckoTerminal</span>
             </div>
             <ul className="grid gap-2 sm:grid-cols-2">
-              {risk.factors.filter((f) => f.contribution > 0 || f.severity !== "safe").map((f) => (
+              {risk.factors.filter((f: RiskFactor) => f.contribution > 0 || f.severity !== "safe").map((f: RiskFactor) => (
                 <li key={f.key} className="flex items-start gap-2 rounded-md border border-hairline bg-surface-2 p-3 text-sm">
                   <span className={cn(
                     "mt-1.5 size-1.5 shrink-0 rounded-full",
@@ -168,7 +168,7 @@ function PreSwapPage() {
               <div className="mt-4 text-sm text-muted-foreground">No safer alternates surfaced right now.</div>
             ) : (
               <ul className="mt-3 divide-y divide-hairline rounded-md border border-hairline">
-                {alts.alts.map((a) => (
+                {alts.alts.map((a: TrendingToken) => (
                   <li key={a.mint} className="flex items-center gap-3 p-3">
                     <div className="size-8 overflow-hidden rounded-full bg-surface-2">
                       {a.logo ? <img src={a.logo} alt="" className="size-full object-cover" /> : null}
