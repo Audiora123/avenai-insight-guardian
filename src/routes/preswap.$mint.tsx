@@ -1,10 +1,9 @@
 import * as React from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { ShieldCheck, ShieldAlert, ShieldQuestion, ArrowRight, ExternalLink, Activity } from "lucide-react";
+import { ArrowRight, ExternalLink, Activity } from "lucide-react";
 import { fetchTokenPage, fetchSaferAlternatives } from "@/server/api.functions";
 import { compact, formatPct, formatUsd, shortAddr } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { RiskFactor } from "@/server/risk";
 import type { TrendingToken } from "@/server/data/types";
 
 export const Route = createFileRoute("/preswap/$mint")({
