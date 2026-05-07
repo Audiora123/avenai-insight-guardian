@@ -138,6 +138,19 @@ function GlobalSearch() {
 
 function ConnectedShortcut() {
   const { publicKey, connected } = useWallet();
+  const navigate = useNavigate();
+  const lastRef = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    if (connected && publicKey) {
+      const addr = publicKey.toBase58();
+      if (lastRef.current !== addr) {
+        lastRef.current = addr;
+        navigate({ to: "/wallet/$address", params: { address: addr } });
+      }
+    } else {
+      lastRef.current = null;
+    }
+  }, [connected, publicKey, navigate]);
   if (!connected || !publicKey) return null;
   return (
     <Link
