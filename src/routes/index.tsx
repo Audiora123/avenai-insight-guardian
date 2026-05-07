@@ -16,6 +16,8 @@ export const Route = createFileRoute("/")({
     ],
   }),
   loader: () => fetchTrending(),
+  staleTime: 20_000,
+  pendingMs: 800,
   component: Index,
 });
 

@@ -10,6 +10,8 @@ import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 export const Route = createFileRoute("/wallet/$address")({
   loader: ({ params }) => fetchWalletPage({ data: { address: params.address } }),
+  staleTime: 25_000,
+  pendingMs: 800,
   head: ({ params }) => ({
     meta: [
       { title: `Wallet ${params.address.slice(0, 6)}… — Avenai X-ray` },

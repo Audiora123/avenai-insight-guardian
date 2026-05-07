@@ -1,10 +1,9 @@
 import * as React from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { ShieldCheck, ShieldAlert, ShieldQuestion, ArrowRight, ExternalLink, Activity } from "lucide-react";
+import { ArrowRight, ExternalLink, Activity } from "lucide-react";
 import { fetchTokenPage, fetchSaferAlternatives } from "@/server/api.functions";
 import { compact, formatPct, formatUsd, shortAddr } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { RiskFactor } from "@/server/risk";
 import type { TrendingToken } from "@/server/data/types";
 
 export const Route = createFileRoute("/preswap/$mint")({
@@ -38,7 +37,7 @@ export const Route = createFileRoute("/preswap/$mint")({
 function PreSwapPage() {
   const { mint } = Route.useParams();
   const { page, alts } = Route.useLoaderData();
-  const { stats, risk, signals, holders } = page;
+  const { stats, signals, holders } = page;
   const [size, setSize] = React.useState<number>(100);
 
   if (!stats) {
@@ -50,15 +49,6 @@ function PreSwapPage() {
       </main>
     );
   }
-
-  const VIcon = risk.verdict === "safe" ? ShieldCheck : risk.verdict === "danger" ? ShieldAlert : ShieldQuestion;
-  const vTone =
-    risk.verdict === "safe" ? "border-safe/40 bg-safe/10 text-safe" :
-    risk.verdict === "danger" ? "border-danger/40 bg-danger/10 text-danger" :
-    "border-caution/40 bg-caution/10 text-caution";
-  const vLabel =
-    risk.verdict === "safe" ? "Safe to swap" :
-    risk.verdict === "danger" ? "Don't swap" : "Swap with caution";
 
   // Estimated price impact for the chosen swap size against a constant-product approximation.
   const liq = stats.liquidityUsd ?? 0;
@@ -75,40 +65,8 @@ function PreSwapPage() {
         <span className="text-foreground">Pre-swap</span>
       </div>
 
-      <div className={cn("flex items-center gap-3 rounded-lg border px-5 py-4", vTone)}>
-        <VIcon className="size-6" />
-        <div className="flex-1">
-          <div className="text-[10px] uppercase tracking-wider opacity-70">Pre-swap verdict for {stats.symbol}</div>
-          <div className="text-xl font-semibold">{vLabel} · risk {risk.score}/100</div>
-          <div className="text-xs opacity-90">{risk.headline}</div>
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="mt-2 grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
-          {/* Exposure */}
-          <section className="rounded-lg border border-hairline bg-surface p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold">Exposure breakdown</h2>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Live · Solana RPC + GeckoTerminal</span>
-            </div>
-            <ul className="grid gap-2 sm:grid-cols-2">
-              {risk.factors.filter((f: RiskFactor) => f.contribution > 0 || f.severity !== "safe").map((f: RiskFactor) => (
-                <li key={f.key} className="flex items-start gap-2 rounded-md border border-hairline bg-surface-2 p-3 text-sm">
-                  <span className={cn(
-                    "mt-1.5 size-1.5 shrink-0 rounded-full",
-                    f.severity === "danger" && "bg-danger",
-                    f.severity === "caution" && "bg-caution",
-                    f.severity === "safe" && "bg-safe",
-                  )} />
-                  <div>
-                    <div className="font-medium">{f.label}</div>
-                    <div className="text-xs text-muted-foreground">{f.detail}</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
 
           {/* Sizing simulator */}
           <section className="rounded-lg border border-hairline bg-surface p-5">
@@ -183,10 +141,17 @@ function PreSwapPage() {
                       <div className="nums text-sm">{formatUsd(a.priceUsd)}</div>
                       <div className={cn("nums text-[11px]", (a.priceChange24h ?? 0) >= 0 ? "text-safe" : "text-danger")}>{formatPct(a.priceChange24h)}</div>
                     </div>
+                    <a
+                      href={`https://jup.ag/swap/SOL-${a.mint}`} target="_blank" rel="noreferrer"
+                      className="inline-flex items-center gap-1 rounded-md bg-foreground px-2 py-1 text-[11px] font-medium text-background hover:bg-foreground/90"
+                      title="Open on Jupiter"
+                    >
+                      Swap <ExternalLink className="size-3" />
+                    </a>
                     <Link
                       to="/preswap/$mint" params={{ mint: a.mint }}
                       className="rounded-md border border-hairline p-1.5 text-muted-foreground hover:bg-surface-2 hover:text-foreground"
-                      title="Run pre-swap on this token"
+                      title="Run pre-swap"
                     >
                       <ArrowRight className="size-4" />
                     </Link>
@@ -201,14 +166,10 @@ function PreSwapPage() {
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Continue trading</div>
             <a
               href={`https://jup.ag/swap/SOL-${mint}`} target="_blank" rel="noreferrer"
-              className={cn(
-                "flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium",
-                risk.verdict === "danger" ? "border border-danger/50 text-danger hover:bg-danger/10" :
-                "bg-foreground text-background hover:bg-foreground/90",
-              )}
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-foreground px-4 py-2.5 text-sm font-medium text-background hover:bg-foreground/90"
             >
               <Activity className="size-4" />
-              {risk.verdict === "danger" ? "Continue anyway on Jupiter" : "Open in Jupiter"}
+              Open in Jupiter
               <ExternalLink className="size-3.5 opacity-70" />
             </a>
             <Link to="/token/$mint" params={{ mint }} className="block w-full rounded-md border border-hairline px-4 py-2.5 text-center text-sm hover:bg-surface-2">
