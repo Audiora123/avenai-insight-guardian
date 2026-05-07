@@ -37,7 +37,7 @@ export const Route = createFileRoute("/preswap/$mint")({
 function PreSwapPage() {
   const { mint } = Route.useParams();
   const { page, alts } = Route.useLoaderData();
-  const { stats, risk, signals, holders } = page;
+  const { stats, signals, holders } = page;
   const [size, setSize] = React.useState<number>(100);
 
   if (!stats) {
