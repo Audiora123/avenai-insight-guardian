@@ -50,15 +50,6 @@ function PreSwapPage() {
     );
   }
 
-  const VIcon = risk.verdict === "safe" ? ShieldCheck : risk.verdict === "danger" ? ShieldAlert : ShieldQuestion;
-  const vTone =
-    risk.verdict === "safe" ? "border-safe/40 bg-safe/10 text-safe" :
-    risk.verdict === "danger" ? "border-danger/40 bg-danger/10 text-danger" :
-    "border-caution/40 bg-caution/10 text-caution";
-  const vLabel =
-    risk.verdict === "safe" ? "Safe to swap" :
-    risk.verdict === "danger" ? "Don't swap" : "Swap with caution";
-
   // Estimated price impact for the chosen swap size against a constant-product approximation.
   const liq = stats.liquidityUsd ?? 0;
   const impactPct = liq > 0 ? Math.min(100, (size / liq) * 100 * 2) : 100;
@@ -74,40 +65,8 @@ function PreSwapPage() {
         <span className="text-foreground">Pre-swap</span>
       </div>
 
-      <div className={cn("flex items-center gap-3 rounded-lg border px-5 py-4", vTone)}>
-        <VIcon className="size-6" />
-        <div className="flex-1">
-          <div className="text-[10px] uppercase tracking-wider opacity-70">Pre-swap verdict for {stats.symbol}</div>
-          <div className="text-xl font-semibold">{vLabel} · risk {risk.score}/100</div>
-          <div className="text-xs opacity-90">{risk.headline}</div>
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="mt-2 grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
-          {/* Exposure */}
-          <section className="rounded-lg border border-hairline bg-surface p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold">Exposure breakdown</h2>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Live · Solana RPC + GeckoTerminal</span>
-            </div>
-            <ul className="grid gap-2 sm:grid-cols-2">
-              {risk.factors.filter((f: RiskFactor) => f.contribution > 0 || f.severity !== "safe").map((f: RiskFactor) => (
-                <li key={f.key} className="flex items-start gap-2 rounded-md border border-hairline bg-surface-2 p-3 text-sm">
-                  <span className={cn(
-                    "mt-1.5 size-1.5 shrink-0 rounded-full",
-                    f.severity === "danger" && "bg-danger",
-                    f.severity === "caution" && "bg-caution",
-                    f.severity === "safe" && "bg-safe",
-                  )} />
-                  <div>
-                    <div className="font-medium">{f.label}</div>
-                    <div className="text-xs text-muted-foreground">{f.detail}</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
 
           {/* Sizing simulator */}
           <section className="rounded-lg border border-hairline bg-surface p-5">
