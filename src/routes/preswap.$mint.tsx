@@ -159,14 +159,10 @@ function PreSwapPage() {
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Continue trading</div>
             <a
               href={`https://jup.ag/swap/SOL-${mint}`} target="_blank" rel="noreferrer"
-              className={cn(
-                "flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium",
-                risk.verdict === "danger" ? "border border-danger/50 text-danger hover:bg-danger/10" :
-                "bg-foreground text-background hover:bg-foreground/90",
-              )}
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-foreground px-4 py-2.5 text-sm font-medium text-background hover:bg-foreground/90"
             >
               <Activity className="size-4" />
-              {risk.verdict === "danger" ? "Continue anyway on Jupiter" : "Open in Jupiter"}
+              Open in Jupiter
               <ExternalLink className="size-3.5 opacity-70" />
             </a>
             <Link to="/token/$mint" params={{ mint }} className="block w-full rounded-md border border-hairline px-4 py-2.5 text-center text-sm hover:bg-surface-2">
