@@ -59,8 +59,8 @@ function TokenPage() {
   }
 
   const ch = stats.priceChange24h ?? 0;
-  const high24 = candles.length ? Math.max(...candles.slice(-24).map((c) => c.h)) : null;
-  const low24 = candles.length ? Math.min(...candles.slice(-24).map((c) => c.l)) : null;
+  const high24 = candles.length ? Math.max(...candles.slice(-24).map((c: { h: number }) => c.h)) : null;
+  const low24 = candles.length ? Math.min(...candles.slice(-24).map((c: { l: number }) => c.l)) : null;
   const jupUrl = `https://jup.ag/swap/SOL-${mint}`;
 
   return (
