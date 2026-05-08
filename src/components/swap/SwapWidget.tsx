@@ -91,7 +91,10 @@ export function SwapWidget({ outputMint, outputSymbol, outputDecimals = 6, initi
       });
       if (!swapResp.ok) throw new Error(`Swap build failed (${swapResp.status})`);
       const { swapTransaction } = (await swapResp.json()) as { swapTransaction: string };
-      const tx = VersionedTransaction.deserialize(Buffer.from(swapTransaction, "base64"));
+      const bin = atob(swapTransaction);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const tx = VersionedTransaction.deserialize(bytes);
       const signed = await wallet.signTransaction(tx);
       const sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: false, maxRetries: 3 });
       setStatus({ kind: "sent", sig });
