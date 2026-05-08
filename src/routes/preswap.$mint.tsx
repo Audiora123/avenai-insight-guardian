@@ -1,18 +1,20 @@
 import * as React from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, Activity } from "lucide-react";
-import { fetchTokenPage, fetchSaferAlternatives } from "@/server/api.functions";
+import { fetchTokenPage, fetchSaferAlternatives, fetchTrending } from "@/server/api.functions";
 import { compact, formatPct, formatUsd, shortAddr } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { SwapWidget } from "@/components/swap/SwapWidget";
 import type { TrendingToken } from "@/server/data/types";
 
 export const Route = createFileRoute("/preswap/$mint")({
   loader: async ({ params }) => {
-    const [page, alts] = await Promise.all([
+    const [page, alts, trend] = await Promise.all([
       fetchTokenPage({ data: { mint: params.mint } }),
       fetchSaferAlternatives({ data: { mint: params.mint } }),
+      fetchTrending(),
     ]);
-    return { page, alts };
+    return { page, alts, solPrice: trend.solPrice };
   },
   head: ({ loaderData }) => ({
     meta: [
