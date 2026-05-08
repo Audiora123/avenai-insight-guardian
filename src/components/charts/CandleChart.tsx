@@ -2,6 +2,24 @@ import * as React from "react";
 
 export interface Candle { t: number; o: number; h: number; l: number; c: number; v: number }
 
+function normalizeCandles(rows: Candle[]) {
+  const bySecond = new Map<number, Candle>();
+  for (const row of rows) {
+    if (![row.t, row.o, row.h, row.l, row.c, row.v].every(Number.isFinite)) continue;
+    const second = Math.floor(row.t / 1000);
+    const prev = bySecond.get(second);
+    bySecond.set(second, prev ? {
+      t: second * 1000,
+      o: prev.o,
+      h: Math.max(prev.h, row.h),
+      l: Math.min(prev.l, row.l),
+      c: row.c,
+      v: prev.v + row.v,
+    } : { ...row, t: second * 1000 });
+  }
+  return [...bySecond.values()].sort((a, b) => a.t - b.t);
+}
+
 /**
  * Bybit-style candlestick chart powered by lightweight-charts.
  * Loads only on the client (dynamic import) so it never breaks SSR.
@@ -87,11 +105,15 @@ export function CandleChart({ candles, height = 380 }: { candles: Candle[]; heig
     const series = seriesRef.current as { setData: (d: unknown[]) => void } | null;
     const vol = volRef.current as { setData: (d: unknown[]) => void } | null;
     if (!series || !vol) return;
-    const sorted = [...rows].sort((a, b) => a.t - b.t);
+    const sorted = normalizeCandles(rows);
     const cs = sorted.map((c) => ({ time: Math.floor(c.t / 1000) as number, open: c.o, high: c.h, low: c.l, close: c.c }));
     const vs = sorted.map((c) => ({ time: Math.floor(c.t / 1000) as number, value: c.v, color: c.c >= c.o ? "rgba(34,197,94,0.5)" : "rgba(239,68,68,0.5)" }));
-    series.setData(cs);
-    vol.setData(vs);
+    try {
+      series.setData(cs);
+      vol.setData(vs);
+    } catch (err) {
+      console.warn("Skipped malformed candle payload", err);
+    }
   }
 
   React.useEffect(() => {
