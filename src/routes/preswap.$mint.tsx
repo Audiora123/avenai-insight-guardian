@@ -96,6 +96,14 @@ function PreSwapPage() {
             </div>
           </section>
 
+          {/* In-platform swap (Jupiter aggregator under the hood) */}
+          <SwapWidget
+            outputMint={mint}
+            outputSymbol={stats.symbol}
+            initialUsd={size}
+            solPriceUsd={solPrice}
+          />
+
           {/* Live trade pulse */}
           <section className="rounded-lg border border-hairline bg-surface p-5">
             <div className="mb-3 flex items-center justify-between">
