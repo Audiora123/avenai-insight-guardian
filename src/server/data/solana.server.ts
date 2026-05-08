@@ -299,10 +299,16 @@ const KNOWN_PROGRAMS: Record<string, { label: string; risk: "safe" | "caution" |
 };
 
 export async function getWalletApprovals(owner: string): Promise<WalletApproval[]> {
-  const ownerPk = new PublicKey(owner);
-  const resp = await rpc().getParsedTokenAccountsByOwner(ownerPk, {
-    programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
-  });
+  let ownerPk: PublicKey;
+  try { ownerPk = new PublicKey(owner); } catch { return []; }
+  let resp;
+  try {
+    resp = await rpc().getParsedTokenAccountsByOwner(ownerPk, {
+      programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+    });
+  } catch {
+    return [];
+  }
   const tokenList = await loadTokenList();
   const out: WalletApproval[] = [];
   for (const acc of resp.value) {
