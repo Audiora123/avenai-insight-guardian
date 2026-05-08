@@ -1,18 +1,20 @@
 import * as React from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, Activity } from "lucide-react";
-import { fetchTokenPage, fetchSaferAlternatives } from "@/server/api.functions";
+import { fetchTokenPage, fetchSaferAlternatives, fetchTrending } from "@/server/api.functions";
 import { compact, formatPct, formatUsd, shortAddr } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { SwapWidget } from "@/components/swap/SwapWidget";
 import type { TrendingToken } from "@/server/data/types";
 
 export const Route = createFileRoute("/preswap/$mint")({
   loader: async ({ params }) => {
-    const [page, alts] = await Promise.all([
+    const [page, alts, trend] = await Promise.all([
       fetchTokenPage({ data: { mint: params.mint } }),
       fetchSaferAlternatives({ data: { mint: params.mint } }),
+      fetchTrending(),
     ]);
-    return { page, alts };
+    return { page, alts, solPrice: trend.solPrice };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -36,7 +38,7 @@ export const Route = createFileRoute("/preswap/$mint")({
 
 function PreSwapPage() {
   const { mint } = Route.useParams();
-  const { page, alts } = Route.useLoaderData();
+  const { page, alts, solPrice } = Route.useLoaderData();
   const { stats, signals, holders } = page;
   const [size, setSize] = React.useState<number>(100);
 
@@ -93,6 +95,14 @@ function PreSwapPage() {
               <Stat label="Tokens received" value={stats.priceUsd ? compact(size / stats.priceUsd) + " " + stats.symbol : "—"} />
             </div>
           </section>
+
+          {/* In-platform swap (Jupiter aggregator under the hood) */}
+          <SwapWidget
+            outputMint={mint}
+            outputSymbol={stats.symbol}
+            initialUsd={size}
+            solPriceUsd={solPrice}
+          />
 
           {/* Live trade pulse */}
           <section className="rounded-lg border border-hairline bg-surface p-5">
