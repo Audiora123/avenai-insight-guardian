@@ -246,14 +246,20 @@ async function loadTokenList(): Promise<Map<string, JupTokenMeta>> {
 }
 
 export async function getWalletHoldings(owner: string): Promise<WalletHolding[]> {
-  const ownerPk = new PublicKey(owner);
-  const [splResp, lamports, tokenList] = await Promise.all([
-    rpc().getParsedTokenAccountsByOwner(ownerPk, {
-      programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
-    }),
-    rpc().getBalance(ownerPk),
-    loadTokenList(),
-  ]);
+  let ownerPk: PublicKey;
+  try { ownerPk = new PublicKey(owner); } catch { return []; }
+  let splResp, lamports, tokenList;
+  try {
+    [splResp, lamports, tokenList] = await Promise.all([
+      rpc().getParsedTokenAccountsByOwner(ownerPk, {
+        programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+      }),
+      rpc().getBalance(ownerPk),
+      loadTokenList(),
+    ]);
+  } catch {
+    return [];
+  }
 
   const balances: Array<{ mint: string; amount: number; decimals: number }> = [];
   balances.push({ mint: SOL_MINT, amount: lamports / 1e9, decimals: 9 });
