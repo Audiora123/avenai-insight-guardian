@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { VersionedTransaction, PublicKey } from "@solana/web3.js";
+import { VersionedTransaction } from "@solana/web3.js";
 import { ArrowDownUp, Loader2, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { compact } from "@/lib/format";
