@@ -44,7 +44,7 @@ function Index() {
             <span>Solana intelligence</span>
             {goldrush && (
               <span className="inline-flex items-center gap-1 rounded border border-hairline px-1.5 py-0.5 text-[10px] normal-case text-foreground">
-                <span className="size-1.5 rounded-full bg-safe animate-pulse" /> GoldRush live
+                <span className="size-1.5 rounded-full bg-safe animate-pulse" /> Live
               </span>
             )}
           </div>
