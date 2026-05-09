@@ -92,10 +92,12 @@ export async function getTrending(limit = 24): Promise<TrendingToken[]> {
   // DexScreener "search" returns active Solana pairs ranked by activity for common queries.
   const queries = ["sol", "usdc", "bonk", "wif", "pump"];
   const seen = new Map<string, TrendingToken>();
-  for (const q of queries) {
-    const data = await dsFetch<{ pairs: DsPair[] }>(
-      `https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(q)}`,
-    );
+  const results = await Promise.all(
+    queries.map((q) =>
+      dsFetch<{ pairs: DsPair[] }>(`https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(q)}`),
+    ),
+  );
+  for (const data of results) {
     if (!data?.pairs) continue;
     for (const p of data.pairs) {
       if (p.chainId !== "solana") continue;
