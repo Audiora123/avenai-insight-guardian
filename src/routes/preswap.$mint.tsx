@@ -151,13 +151,13 @@ function PreSwapPage() {
                       <div className="nums text-sm">{formatUsd(a.priceUsd)}</div>
                       <div className={cn("nums text-[11px]", (a.priceChange24h ?? 0) >= 0 ? "text-safe" : "text-danger")}>{formatPct(a.priceChange24h)}</div>
                     </div>
-                    <a
-                      href={`https://jup.ag/swap/SOL-${a.mint}`} target="_blank" rel="noreferrer"
+                    <Link
+                      to="/preswap/$mint" params={{ mint: a.mint }}
                       className="inline-flex items-center gap-1 rounded-md bg-foreground px-2 py-1 text-[11px] font-medium text-background hover:bg-foreground/90"
-                      title="Open on Jupiter"
+                      title="Pre-swap & swap on Avenai"
                     >
-                      Swap <ExternalLink className="size-3" />
-                    </a>
+                      Swap
+                    </Link>
                     <Link
                       to="/preswap/$mint" params={{ mint: a.mint }}
                       className="rounded-md border border-hairline p-1.5 text-muted-foreground hover:bg-surface-2 hover:text-foreground"
