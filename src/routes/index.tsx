@@ -58,7 +58,7 @@ function Index() {
             <div className="mt-3 inline-flex items-center gap-2 rounded-md border border-hairline bg-surface-2 px-3 py-1.5 text-xs">
               <span className="text-muted-foreground">SOL</span>
               <span className="nums font-semibold">${solPrice.toFixed(2)}</span>
-              <span className="text-[10px] text-muted-foreground">via GoldRush spot pricing</span>
+              <span className="text-[10px] text-muted-foreground">spot price</span>
             </div>
           )}
         </div>
