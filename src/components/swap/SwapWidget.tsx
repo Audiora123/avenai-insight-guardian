@@ -112,7 +112,7 @@ export function SwapWidget({ outputMint, outputSymbol, outputDecimals = 6, initi
     <section className="rounded-lg border border-hairline bg-surface p-5">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-semibold">Swap on Avenai</h2>
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Powered by Jupiter aggregator</span>
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Best route aggregator</span>
       </div>
 
       {/* Pay */}

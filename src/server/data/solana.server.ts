@@ -92,10 +92,12 @@ export async function getTrending(limit = 24): Promise<TrendingToken[]> {
   // DexScreener "search" returns active Solana pairs ranked by activity for common queries.
   const queries = ["sol", "usdc", "bonk", "wif", "pump"];
   const seen = new Map<string, TrendingToken>();
-  for (const q of queries) {
-    const data = await dsFetch<{ pairs: DsPair[] }>(
-      `https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(q)}`,
-    );
+  const results = await Promise.all(
+    queries.map((q) =>
+      dsFetch<{ pairs: DsPair[] }>(`https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(q)}`),
+    ),
+  );
+  for (const data of results) {
     if (!data?.pairs) continue;
     for (const p of data.pairs) {
       if (p.chainId !== "solana") continue;
@@ -119,7 +121,16 @@ export async function getTrending(limit = 24): Promise<TrendingToken[]> {
       }
     }
   }
-  return [...seen.values()]
+  // Backfill missing logos from Jupiter strict token list.
+  const list = await loadTokenList();
+  const out = [...seen.values()].map((t) => {
+    if (!t.logo) {
+      const meta = list.get(t.mint);
+      if (meta?.logoURI) t.logo = meta.logoURI;
+    }
+    return t;
+  });
+  return out
     .filter((t) => (t.liquidityUsd ?? 0) > 5_000)
     .sort((a, b) => (b.volume24hUsd ?? 0) - (a.volume24hUsd ?? 0))
     .slice(0, limit);

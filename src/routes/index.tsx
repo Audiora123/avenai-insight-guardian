@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Avenai — Solana token & wallet intelligence" },
-      { name: "description", content: "Discover trending Solana tokens, get pre-swap risk verdicts, and X-ray any wallet. Powered by GoldRush." },
+      { name: "description", content: "Discover trending Solana tokens, get pre-swap risk verdicts, and X-ray any wallet." },
     ],
   }),
   loader: () => fetchTrending(),
@@ -44,7 +44,7 @@ function Index() {
             <span>Solana intelligence</span>
             {goldrush && (
               <span className="inline-flex items-center gap-1 rounded border border-hairline px-1.5 py-0.5 text-[10px] normal-case text-foreground">
-                <span className="size-1.5 rounded-full bg-safe animate-pulse" /> GoldRush live
+                <span className="size-1.5 rounded-full bg-safe animate-pulse" /> Live
               </span>
             )}
           </div>
@@ -58,7 +58,7 @@ function Index() {
             <div className="mt-3 inline-flex items-center gap-2 rounded-md border border-hairline bg-surface-2 px-3 py-1.5 text-xs">
               <span className="text-muted-foreground">SOL</span>
               <span className="nums font-semibold">${solPrice.toFixed(2)}</span>
-              <span className="text-[10px] text-muted-foreground">via GoldRush spot pricing</span>
+              <span className="text-[10px] text-muted-foreground">spot price</span>
             </div>
           )}
         </div>
@@ -121,16 +121,12 @@ function Index() {
                 </tr>
               ))}
               {rows.length === 0 && (
-                <tr><td colSpan={7} className="px-4 py-12 text-center text-sm text-muted-foreground">Loading Solana market data…</td></tr>
+                <tr><td colSpan={7} className="px-4 py-12 text-center text-sm text-muted-foreground">Loading market data…</td></tr>
               )}
             </tbody>
           </table>
         </div>
       </section>
-
-      <p className="mt-6 text-center text-[11px] text-muted-foreground">
-        Powered by GoldRush · DexScreener · Jupiter · Solana RPC
-      </p>
     </main>
   );
 }

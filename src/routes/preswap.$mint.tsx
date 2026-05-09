@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { ArrowRight, ExternalLink, Activity } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { fetchTokenPage, fetchSaferAlternatives, fetchTrending } from "@/server/api.functions";
 import { compact, formatPct, formatUsd, shortAddr } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -151,13 +151,13 @@ function PreSwapPage() {
                       <div className="nums text-sm">{formatUsd(a.priceUsd)}</div>
                       <div className={cn("nums text-[11px]", (a.priceChange24h ?? 0) >= 0 ? "text-safe" : "text-danger")}>{formatPct(a.priceChange24h)}</div>
                     </div>
-                    <a
-                      href={`https://jup.ag/swap/SOL-${a.mint}`} target="_blank" rel="noreferrer"
+                    <Link
+                      to="/preswap/$mint" params={{ mint: a.mint }}
                       className="inline-flex items-center gap-1 rounded-md bg-foreground px-2 py-1 text-[11px] font-medium text-background hover:bg-foreground/90"
-                      title="Open on Jupiter"
+                      title="Pre-swap & swap on Avenai"
                     >
-                      Swap <ExternalLink className="size-3" />
-                    </a>
+                      Swap
+                    </Link>
                     <Link
                       to="/preswap/$mint" params={{ mint: a.mint }}
                       className="rounded-md border border-hairline p-1.5 text-muted-foreground hover:bg-surface-2 hover:text-foreground"
@@ -173,15 +173,7 @@ function PreSwapPage() {
 
           {/* Action buttons */}
           <div className="space-y-2 rounded-lg border border-hairline bg-surface p-5">
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Continue trading</div>
-            <a
-              href={`https://jup.ag/swap/SOL-${mint}`} target="_blank" rel="noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-md bg-foreground px-4 py-2.5 text-sm font-medium text-background hover:bg-foreground/90"
-            >
-              <Activity className="size-4" />
-              Open in Jupiter
-              <ExternalLink className="size-3.5 opacity-70" />
-            </a>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Continue</div>
             <Link to="/token/$mint" params={{ mint }} className="block w-full rounded-md border border-hairline px-4 py-2.5 text-center text-sm hover:bg-surface-2">
               Back to token report
             </Link>

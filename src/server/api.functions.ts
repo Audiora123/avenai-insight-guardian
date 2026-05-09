@@ -39,16 +39,17 @@ export const fetchTokenPage = createServerFn({ method: "GET" })
   .inputValidator((d: { mint: string }) => d)
   .handler(async ({ data }) => {
     const stats = await getTokenStats(data.mint);
-    const [holders, swaps, candles] = await Promise.all([
+    const [holders, swaps, candles, solPrice] = await Promise.all([
       getTopHolders(data.mint, 20),
       stats?.pairAddress ? getRecentSwaps(stats.pairAddress, 60) : Promise.resolve([]),
       stats?.pairAddress ? getOHLCV(stats.pairAddress, "hour", 1, 168) : Promise.resolve([]),
+      getNativeSolPrice(),
     ]);
     const risk = scoreToken(stats, holders);
     const analogs = predictByAnalogs(stats, holders);
     const rules = predictByRules(stats, holders);
     const signals = computeSignals(swaps, holders, stats);
-    return { stats, holders, swaps, candles, risk, analogs, rules, signals };
+    return { stats, holders, swaps, candles, risk, analogs, rules, signals, solPrice };
   });
 
 // Safer alternatives engine — for Pre-Swap suggestions.
