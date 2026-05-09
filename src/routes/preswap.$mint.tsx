@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { ArrowRight, ExternalLink, Activity } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { fetchTokenPage, fetchSaferAlternatives, fetchTrending } from "@/server/api.functions";
 import { compact, formatPct, formatUsd, shortAddr } from "@/lib/format";
 import { cn } from "@/lib/utils";
