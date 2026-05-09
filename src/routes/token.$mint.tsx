@@ -62,7 +62,7 @@ function TokenPage() {
   const ch = stats.priceChange24h ?? 0;
   const high24 = candles.length ? Math.max(...candles.slice(-24).map((c: { h: number }) => c.h)) : null;
   const low24 = candles.length ? Math.min(...candles.slice(-24).map((c: { l: number }) => c.l)) : null;
-  const jupUrl = `https://jup.ag/swap/SOL-${mint}`;
+  const solPrice = (data as { solPrice?: number | null }).solPrice ?? null;
 
   return (
     <main className="mx-auto max-w-[1400px] px-4 py-4">
