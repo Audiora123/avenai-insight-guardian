@@ -121,7 +121,16 @@ export async function getTrending(limit = 24): Promise<TrendingToken[]> {
       }
     }
   }
-  return [...seen.values()]
+  // Backfill missing logos from Jupiter strict token list.
+  const list = await loadTokenList();
+  const out = [...seen.values()].map((t) => {
+    if (!t.logo) {
+      const meta = list.get(t.mint);
+      if (meta?.logoURI) t.logo = meta.logoURI;
+    }
+    return t;
+  });
+  return out
     .filter((t) => (t.liquidityUsd ?? 0) > 5_000)
     .sort((a, b) => (b.volume24hUsd ?? 0) - (a.volume24hUsd ?? 0))
     .slice(0, limit);
