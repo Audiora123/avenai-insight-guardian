@@ -204,17 +204,10 @@ function TokenPage() {
 
         {/* Right rail */}
         <aside className="space-y-3">
-          <div className="rounded-lg border border-hairline bg-surface p-4">
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Swap action</div>
-            <div className="mt-2 flex flex-col gap-2">
-              <a href={jupUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background hover:bg-foreground/90">
-                <Activity className="size-4" /> Open Jupiter swap <ExternalLink className="size-3.5 opacity-70" />
-              </a>
-              <Link to="/preswap/$mint" params={{ mint }} className="rounded-md border border-hairline px-3 py-2 text-center text-sm hover:bg-surface-2">
-                Pre-swap safer routes
-              </Link>
-            </div>
-          </div>
+          <SwapWidget outputMint={mint} outputSymbol={stats.symbol} solPriceUsd={solPrice} initialUsd={50} />
+          <Link to="/preswap/$mint" params={{ mint }} className="block rounded-md border border-hairline bg-surface px-3 py-2 text-center text-sm hover:bg-surface-2">
+            Pre-swap safer routes
+          </Link>
 
           <div className="rounded-lg border border-hairline bg-surface p-4">
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Token info</div>
