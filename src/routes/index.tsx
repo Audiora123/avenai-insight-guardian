@@ -121,16 +121,12 @@ function Index() {
                 </tr>
               ))}
               {rows.length === 0 && (
-                <tr><td colSpan={7} className="px-4 py-12 text-center text-sm text-muted-foreground">Loading Solana market data…</td></tr>
+                <tr><td colSpan={7} className="px-4 py-12 text-center text-sm text-muted-foreground">Loading market data…</td></tr>
               )}
             </tbody>
           </table>
         </div>
       </section>
-
-      <p className="mt-6 text-center text-[11px] text-muted-foreground">
-        Powered by GoldRush · DexScreener · Jupiter · Solana RPC
-      </p>
     </main>
   );
 }
