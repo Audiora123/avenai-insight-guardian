@@ -9,6 +9,7 @@ import { PredictionCards } from "@/components/predict/PredictionCards";
 import { CandleChart } from "@/components/charts/CandleChart";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { AnimatedNumber, PulseDot } from "@/components/animated/AnimatedNumber";
+import { SwapWidget } from "@/components/swap/SwapWidget";
 
 export const Route = createFileRoute("/token/$mint")({
   loader: ({ params }) => fetchTokenPage({ data: { mint: params.mint } }),
