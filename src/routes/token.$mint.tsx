@@ -136,7 +136,7 @@ function TokenPage() {
                 <span className="font-medium">{stats.symbol}/USD · 1H</span>
                 <span className="text-muted-foreground">{candles.length} candles · 7d</span>
               </div>
-              <div className="text-[11px] text-muted-foreground">Real-time · GeckoTerminal</div>
+              <div className="text-[11px] text-muted-foreground">Real-time</div>
             </div>
             {candles.length > 0 ? (
               <CandleChart candles={candles} height={420} />
