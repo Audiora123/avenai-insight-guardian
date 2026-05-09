@@ -118,16 +118,10 @@ function TokenPage() {
         <div className="flex items-center gap-2">
           <Link
             to="/preswap/$mint" params={{ mint }}
-            className="rounded-md border border-hairline px-3 py-2 text-sm hover:bg-surface-2"
-          >
-            Pre-swap check
-          </Link>
-          <a
-            href={jupUrl} target="_blank" rel="noreferrer"
             className="inline-flex items-center gap-1.5 rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background hover:bg-foreground/90"
           >
-            <Activity className="size-4" /> Trade on Jupiter
-          </a>
+            <Activity className="size-4" /> Pre-swap & swap
+          </Link>
         </div>
       </div>
 
