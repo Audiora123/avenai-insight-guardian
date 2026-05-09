@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Avenai — Solana token & wallet intelligence" },
-      { name: "description", content: "Discover trending Solana tokens, get pre-swap risk verdicts, and X-ray any wallet. Powered by GoldRush." },
+      { name: "description", content: "Discover trending Solana tokens, get pre-swap risk verdicts, and X-ray any wallet." },
     ],
   }),
   loader: () => fetchTrending(),
