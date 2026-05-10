@@ -59,9 +59,12 @@ export function SwapWidget({ outputMint, outputSymbol, outputDecimals = 6, initi
       try {
         setStatus({ kind: "quoting" });
         const raw = BigInt(Math.floor(n * Math.pow(10, inputDecimals))).toString();
-        const url = `https://quote-api.jup.ag/v6/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${raw}&slippageBps=${slippageBps}&onlyDirectRoutes=false`;
+        const url = `https://lite-api.jup.ag/swap/v1/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${raw}&slippageBps=${slippageBps}&restrictIntermediateTokens=true`;
         const r = await fetch(url);
-        if (!r.ok) throw new Error(`Quote failed (${r.status})`);
+        if (!r.ok) {
+          const txt = await r.text().catch(() => "");
+          throw new Error(`Quote failed (${r.status})${txt ? `: ${txt.slice(0, 120)}` : ""}`);
+        }
         const q = (await r.json()) as QuoteResp;
         if (!alive) return;
         setStatus({ kind: "quoted", q });
