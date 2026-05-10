@@ -81,7 +81,7 @@ export function SwapWidget({ outputMint, outputSymbol, outputDecimals = 6, initi
     const q = status.q;
     try {
       setStatus({ kind: "swapping", q });
-      const swapResp = await fetch("https://quote-api.jup.ag/v6/swap", {
+      const swapResp = await fetch("https://lite-api.jup.ag/swap/v1/swap", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
