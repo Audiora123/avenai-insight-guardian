@@ -88,8 +88,8 @@ export async function getTokenStats(mint: string): Promise<TokenStats | null> {
 }
 
 // Trending: search Solana boosted/active pairs and surface the highest-volume ones.
+let _trendingCache: { ts: number; data: TrendingToken[] } | null = null;
 export async function getTrending(limit = 24): Promise<TrendingToken[]> {
-  // DexScreener "search" returns active Solana pairs ranked by activity for common queries.
   const queries = ["sol", "usdc", "bonk", "wif", "pump"];
   const seen = new Map<string, TrendingToken>();
   const results = await Promise.all(
@@ -121,7 +121,6 @@ export async function getTrending(limit = 24): Promise<TrendingToken[]> {
       }
     }
   }
-  // Backfill missing logos from Jupiter strict token list.
   const list = await loadTokenList();
   const out = [...seen.values()].map((t) => {
     if (!t.logo) {
@@ -130,10 +129,19 @@ export async function getTrending(limit = 24): Promise<TrendingToken[]> {
     }
     return t;
   });
-  return out
+  const final = out
     .filter((t) => (t.liquidityUsd ?? 0) > 5_000)
     .sort((a, b) => (b.volume24hUsd ?? 0) - (a.volume24hUsd ?? 0))
     .slice(0, limit);
+  // Resilience: if this fetch came back thin, fall back to the last good payload.
+  if (final.length >= 8) {
+    _trendingCache = { ts: Date.now(), data: final };
+    return final;
+  }
+  if (_trendingCache && Date.now() - _trendingCache.ts < 5 * 60_000) {
+    return _trendingCache.data.slice(0, limit);
+  }
+  return final;
 }
 
 export async function searchTokens(query: string, limit = 12): Promise<TrendingToken[]> {
