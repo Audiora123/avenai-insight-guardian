@@ -209,20 +209,22 @@ export async function getTopHolders(mint: string, limit = 20): Promise<HolderRow
 
 // ---------- Wallet portfolio (real SPL balances + Jupiter prices)
 interface JupPriceResp {
-  data: Record<string, { id: string; price: number }>;
+  [mint: string]: { usdPrice?: number; price?: number } | null;
 }
 
 async function jupPrices(mints: string[]): Promise<Record<string, number>> {
   if (!mints.length) return {};
   const out: Record<string, number> = {};
-  // Jupiter price API limits ~100 ids per call.
-  for (let i = 0; i < mints.length; i += 100) {
-    const slice = mints.slice(i, i + 100).join(",");
+  for (let i = 0; i < mints.length; i += 50) {
+    const slice = mints.slice(i, i + 50).join(",");
     try {
-      const r = await fetch(`https://price.jup.ag/v6/price?ids=${slice}`);
+      const r = await fetch(`https://lite-api.jup.ag/price/v3?ids=${slice}`);
       if (!r.ok) continue;
       const j = (await r.json()) as JupPriceResp;
-      for (const [k, v] of Object.entries(j.data || {})) out[k] = v.price;
+      for (const [k, v] of Object.entries(j || {})) {
+        const px = v?.usdPrice ?? v?.price;
+        if (typeof px === "number") out[k] = px;
+      }
     } catch {
       /* ignore */
     }
@@ -231,9 +233,11 @@ async function jupPrices(mints: string[]): Promise<Record<string, number>> {
 }
 
 interface JupTokenMeta {
-  address: string;
+  id?: string;
+  address?: string;
   symbol: string;
   name: string;
+  icon?: string;
   logoURI?: string;
   decimals: number;
 }
@@ -242,13 +246,17 @@ let _tokenList: Map<string, JupTokenMeta> | null = null;
 async function loadTokenList(): Promise<Map<string, JupTokenMeta>> {
   if (_tokenList) return _tokenList;
   try {
-    const r = await fetch("https://token.jup.ag/strict");
+    const r = await fetch("https://lite-api.jup.ag/tokens/v2/toptraded/24h?limit=200");
     if (!r.ok) {
       _tokenList = new Map();
       return _tokenList;
     }
     const arr = (await r.json()) as JupTokenMeta[];
-    _tokenList = new Map(arr.map((t) => [t.address, t]));
+    _tokenList = new Map(
+      arr
+        .map((t) => [(t.id ?? t.address) as string, { ...t, logoURI: t.logoURI ?? t.icon }] as const)
+        .filter(([k]) => !!k),
+    );
     return _tokenList;
   } catch {
     _tokenList = new Map();
